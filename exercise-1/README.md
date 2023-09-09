@@ -11,7 +11,7 @@
 
 From a single test run we got: 19610281 instead of the 20 million (20000000).
 
-This is as expected due to the code in LongCounter not being thread safe. Thereby, a `read-modify-write` `race-condition` can occur where both threads reads the same value, and saves the modified value, such that what should have been `x + 2` is instead `x + 1`.
+TODO (language): This is as expected due to the code in LongCounter not being thread safe. Thereby, a `read-modify-write` `race-condition` can occur where both threads reads the same value x, they then both modify x with x = x + 1 and finally they both save the outcome of this calculation. Because both thread read the same value of x, and saved their modification to memory it looks like only x + 1 was performed
 
 #### 2
     Reduce the counts value from 10 million to 100, recompile, and rerun the code. It is now likely that you get the expected result (200) in every run. 
@@ -29,9 +29,9 @@ It's likely that we will get 200 as the output, but we still can't guarantee it.
 
     Do you think it would make any difference to use one of these forms instead? Why? Change the code and run it. Do you see any difference in the results for any of these alternatives?
 
-No we don't believe that it would change the outcome of the program. This is due to the 3 forms of incrementing `count = count + 1`, `count += 1` and `count++` are all compiled into the same expression in the JVM (see below), and the 3 ways of writing it is just syntactic sugar. When running some small test on theese different setups, we also see the same issues with the `race condition`.
+No we don't believe that it would change the outcome of the program. This is due to the 3 forms of incrementing `count = count + 1`, `count += 1` and `count++` are all compiled into the same expression in the JVM (see below), and the 3 ways of writing it is just syntactic sugar. When running some small test using the 3 different methods of calculating `count + 1`, we observe the same `race condition`.
 
-An abstract representation of the +1 calculation
+An abstract representation of the `count + 1` calculation
 
 ```java
 var temp = value;
@@ -58,6 +58,8 @@ public synchronized void increment() {
 ...
 ```
 
+This marks the code inside the `incrment` function as a `critical section` that only 1 thread can execute at a time
+
 Now whenever a thread wants to perform the increment method, a counter is incremented in the JVM and the current thread is set as holding the lock. Then it can perform the increment of count. Once done the JVM decerements the count and no longer associates the thread with the lock. Now the same or a new thread can lock the resource.
 
 While all of this is happening, no other thread can get a lock on the count.
@@ -66,6 +68,8 @@ While all of this is happening, no other thread can get a lock on the count.
     By using the ReetrantLock in the exercise above, you have defined a critical section. Does your critical section contain the least number of lines of code? If so, explain why. If not, fix it and explain why your new critical section contains the least number of lines of code.
 
     Hint: Recall that the critical section should only include the parts of the program that only one thread can execute at the same time.
+
+TOOD: could it be made simpler with an AtomicInteger in counter?
 
 Yes the `critical section` includes the least amount of lines. This is due to the `race condition` being a read-modify-write which occurs in the increment method. By making this sunchronized we ensure that only one thread can execute the critical section, at a time.
 
@@ -121,13 +125,15 @@ Error:
 ..., t2(0), t1(0), t1(1), t1(2), t2(1), t2(2)
 ```
 
-Here some action delays thread 2 execution such that thread 1 starts executing out of order, and this would lead to the error shown in the example.
+Here some action delays thread 2's execution of t2(2) and t2(3) such that thread 1 starts executing out of order, and this would lead to the error shown in the example.
 
 #### 3
     Use Java ReentrantLock to ensure that the program outputs the expected sequence -|-|-|-|....
     
     Compile and run the improved program to see whether it works. Explain why your solution is correct, and
     why it is not possible for incorrect patterns, such as in the output above, to appear.
+
+TODO: is this actually the best solution?
 
 By adding the `synchronized` keyowrd to the `print` method as below, the sequence will never overlap as shown in the previous question
 
@@ -146,7 +152,7 @@ public synchronized void print() {
 ...
 ```
 
-As the print statements are now defined in a critical section, that only one thread can access, we can ensure that there will be no weaving faults in the output. This is because the weaving fault requires two threads to print the same character out of sync, which the synchronized keyword limits, as both prints statements are in the critical section.
+As the print statements are now defined in a critical section, that only one thread can access, we can ensure that there will be no weaving faults in the output. This is because the weaving fault requires two threads to print the same character out of sync, which the synchronized keyword limits, as both prints statements and the sleep call are in the critical section.
 
 ### 1.3
     Imagine that due to the COVID-19 pandemic Tivoli decides to limit the number of visitors to 15000. To this end, you are asked to modify the code for the turnstiles we saw in the lecture. The file CounterThreads2Covid.java includes a new constant MAX_PEOPLE_COVID equal to 15000. However, the two threads simulate 20000 people entering to the park, so unfortunately some people will not get in :’(.
