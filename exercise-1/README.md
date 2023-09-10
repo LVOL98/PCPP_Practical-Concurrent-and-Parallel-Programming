@@ -144,9 +144,7 @@ Here some action delays thread 2's execution of t2(2) and t2(3) such that thread
     Compile and run the improved program to see whether it works. Explain why your solution is correct, and
     why it is not possible for incorrect patterns, such as in the output above, to appear.
 
-TODO: is this actually the best solution?
-
-By adding the `synchronized` keyowrd to the `print` method as below, the sequence will never overlap as shown in the previous question
+By adding the `synchronized` keyword to the `print` method as below, the sequence will never overlap as shown in the previous question
 
 ```java
 ...
@@ -171,6 +169,7 @@ As the print statements are now defined in a critical section, that only one thr
 #### 1
     Modify the behaviour of the Turnstile thread class so that that exactly 15000 enter the park; no less no more. To this end, simply add a check before incrementing counter to make sure that there are less than 15000 people in the park. Note that the class does not use any type of locks. You must use ReentrantLock to ensure that the program outputs the correct value, 15000.
 
+TODO
 The code below shows the changes made, note that any part not changed is excluded
 
 ```java
@@ -211,6 +210,20 @@ TODO: actually don't know
 
 #### 1
     Compare the categories in the concurrency note (https://github.itu.dk/jst/PCPP2023-public/blob/main/week01/concurrencyNotes/concurrencyPCPP.pdf and Goetz, try to find some examples of systems which are included in the categories of Goetz, but not in those in the concurrency note, and vice versa (if possible - if not possible, argue why)
+
+Goetz presents the following 3 categories:
+- Resource utilization
+- Fairness
+- Convenience
+
+The concurrency note presents the following categories:
+- Exploitation/Hardware
+- Inherent
+- Hidden
+
+Let go through by taking each of Goetz definitions and see how they relate to the concurrency note
+
+
 
 Goetz resource utilization encompasses the concurrency note's interacting with the environment and resource sharing
 
