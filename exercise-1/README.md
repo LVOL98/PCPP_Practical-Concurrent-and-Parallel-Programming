@@ -184,8 +184,6 @@ Here some action delays thread 2's execution of t2(2) and t2(3) such that thread
     
 *Compile and run the improved program to see whether it works. Explain why your solution is correct, and why it is not possible for incorrect patterns, such as in the output above, to appear.*
 
-TODO: is this actually the best solution?
-
 By adding the `ReentrantLock` as follows, we can ensure the program prints the expected output
 
 ```java
