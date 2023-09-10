@@ -2,6 +2,9 @@
 // sestoft@itu.dk * 2015-10-29
 package exercises02;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class TestLocking0 {
     public static void main(String[] args) {
 		final int count = 1_000_000;
@@ -22,16 +25,35 @@ public class TestLocking0 {
 
 class Mystery {
     private static double sum = 0;
+	private static FifoReadWriteMonitor lock = new FifoReadWriteMonitor();
 
     public static synchronized void addStatic(double x) {
-		sum += x;
+		lock.writeLock();
+
+		try {
+			sum += x;
+		} finally {
+			lock.writeUnlock();
+		}
     }
 
     public synchronized void addInstance(double x) {
-		sum += x;
+		lock.writeLock();
+
+		try {
+			sum += x;
+		} finally {
+			lock.writeUnlock();
+		}
     }
 
     public static synchronized double sum() {
-		return sum;
+		lock.readLock();
+
+		try {
+			return sum;
+		} finally {
+			lock.readUnlock();
+		}
     }
 }

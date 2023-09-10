@@ -6,3 +6,5 @@ build
 
 # Ignore temporal linux files
 *~
+
+# app/bin/*
