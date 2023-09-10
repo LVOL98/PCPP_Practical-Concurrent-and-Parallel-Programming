@@ -9,9 +9,20 @@
     
     What output values do you get? Do you get the expected output, i.e., 20 million?
 
-From a single test run we got: 19610281 instead of the 20 million (20000000).
+From a single test run we got: 19610281 instead of the expected 20 million (20000000).
 
-TODO (language): This is as expected due to the code in LongCounter not being thread safe. Thereby, a `read-modify-write` `race-condition` can occur where both threads reads the same value x, they then both modify x with x = x + 1 and finally they both save the outcome of this calculation. Because both thread read the same value of x, and saved their modification to memory it looks like only x + 1 was performed
+This is as expected due to the code in LongCounter not being thread safe. Its increment is not atomic and can, thereby, lead to a `read-modify-write race-condition`. An interleaving of events can lead to an unexpected outcome, take the following sequence of actions with thread A and B
+
+```
+A reads count = 42
+B reads count = 42
+A modifies count = 42 + 1 = 43
+B modifies count = 42 + 1 = 43
+B writes count = 42 to memory
+A writes count = 42 to memory
+```
+
+Here we would have expected that e.g. A executed and B executed hence the final state of count is 43, but due to the `race condition`, we get a unexpected result.
 
 #### 2
     Reduce the counts value from 10 million to 100, recompile, and rerun the code. It is now likely that you get the expected result (200) in every run. 

@@ -19,6 +19,8 @@ See [/app/src/main/java/exercises02/FifoReadWriteMonitor.java](/app/src/main/jav
 
 Given a single write thread that requests access, then the solution is fair in regards to starvation. As once the write thread requests access, no more read access is given, hence the write thread will eventually obtain access. If there's more than one write thread, and they keep coming indefinetly, we cannot guarantee that one or more write thread suffer from starvation
 
+Note, that this solution can have an integer overflow bug, but it was decided to leave the execrise as is, and try to fic this at a later point
+
 ## Exercise 2.2
     Consider the lecture’s example in file TestMutableInteger.java, which contains this definition of class MutableInteger:
 
@@ -61,23 +63,22 @@ System.out.println("Thread t completed, and so does main");
 #### 1
     Execute the example as is. Do you observe the "main" thread’s write to mi.value remains invisible to the t thread, so that it loops forever? Independently of your observation, is it possible that the program loops forever? Explain your answer.
 
-Yes as stated in the explenation of the tasks, it is possible that thread t loops forever. This is due to the initial value of mi is 0, and the `mi.set(42)` never becomes visible to thread t. Hence the while loops will forever be false in this keep, and thread t will never terminate
+Yes as stated in the explenation of the tasks, it is possible that thread t loops forever. This is due to the initial value of mi is 0, and the `mi.set(42)` never becomes visible to thread t. Hence the condition in the whlie loop will always be false and the while loop will never terminate
 
 #### 2
     Use Java Intrinsic Locks (synchronized) on the methods of the MutableInteger to ensure that thread t always terminates. Explain why your solution prevents thread t from running forever.
 
-When modifying the `set()` and `get()` methods with the synchronized keyword (Java Intrinsic Lock), we ensure that both methods ensures mutual exclusion when executing the methods. Besides this, the synchronized keyword also ensure that the result of the execution is visible to all other threads, such that no changes can be hidden. Now the modification to `mi.set(42);` will always be visible to all other threads, hence the program will always terminate.
+When modifying the `set()` and `get()` methods with the synchronized keyword (Java Intrinsic Lock). Besdes ensuring mutual exclusion, what's important here is, that the visibility of changes between the two threads are ensured. Now the change made with the `mi.set(42)` is made visible to all threads, hence the program will always terminate
 
 #### 3
     Would thread t always terminate if get() is not defined as synchronized? Explain your answer
 
-The method `get` needs to use the synchronized keyword, or an infinite while loop can occur. It's again the visiblity guarantee we need, in order fir the call to `mi.get()` to be synchronized with the latest changes to `mi`
-
+If `get()` is not synhcronized then we cannot guarantee that thread t will terminate. This is again due to the visiblity guarantee provided by the synchronized keyword. If `get()` is not synchronized the JMM might cache the value of get, since its spinning asking for `mi.get()`
 
 #### 4
     Remove all the locks in the program, and define value in MutableInteger as a volatile variable. Does thread t always terminate in this case? Explain your answer
 
-TODO: yes, as the volatile keyword guarantees visibility, but doesn't guarantee mutula exclusion, which isn't needed in this specific case
+Yes the program terminates. Again the visibility guarantee of the volatile keyword is enough, as the while loop is spinning asking for `mi.get()`, hence that if the action `mi.set(42)` eventually becomes visible to thread t, it will terminate
 
 ## Exercise 2.3
 
@@ -99,16 +100,16 @@ Given that we got different results in all three runs, we expect some kind of ra
 #### 2
  Explain why race conditions appear when t1 and t2 use the Mystery object. Hint: Consider (a) what it means for an instance method to be synchronized, and (b) what it means for a static method to be synchronized
 
-The two different methods synchronizes on two different things. Take `public static synchronized addStatic(double x)`, due to the use of both `static` and `synchronized`, this method will synchronize on the class object itself. Now `public synchronized addInstance(double x)` is missing the `static` keyword and does then synchronize on the instance of the class
+The two different methods synchronize on two different things. Take `public static synchronized addStatic(double x)`, due to the use of both `static` and `synchronized`, this method will synchronize on the class object itself, while `public synchronized addInstance(double x)` is missing the `static` keyword and does then synchronize on the class object, but the specific instance of the class 
 
-Hence the two methods actually uses the different locks and are therefore, not synchronie between one another
+Hence the two methods actually uses the different locks and are therefore, does not synchronie between one another
 
 #### 3
     Implement a new version of the class Mystery so that the execution of t1 and t2 does not produce race conditions, without changing the modifiers of the field and methods in the Mystery class. That is, you should not make any static field into an instance field (or vice versa), and you should not make any static method into an instance method (or vice versa).
 
     Explain why your new implementation does not have race conditions.
 
-If we cannot change the modifiers, we have to introduce a lock. Now since we have to instances of the `Mystery` class, and they both operates on different parts of the class, the lock has to be static, in order to be accesible by all instances of the class, and on all levels of the class (on the class object itself and all instances). See the follwoing modifications to the `Mysetery` class below
+If we cannot change the modifiers, we have to introduce a lock. Since we need to ensure synchronization between both the class object and the class instance the lock has to be static. This is needed in order for the same lock to be visible to both the class object and the class instance. See the follwoing modifications to the `Mysetery` class below
 
 ```java
 class Mystery {
@@ -147,9 +148,9 @@ class Mystery {
 }
 ```
 
-Now the same lock os used for both instance- and class object access, which in turns means that we have achieved synchronization of between `addInstance` and `addStatic` thereby eliminating the race condition
+Now the same lock is used for both class instance- and class object access, which in turns means that we have achieved synchronization between `addInstance` and `addStatic` thereby eliminating the race condition
 
 #### 4
     Note that the method sum() also uses an intrinsic lock. Is the use of this intrinsic lock on sum() necessary for this program? In other words, would there be race conditions if you remove the modifier synchronized from sum() (assuming that you have fixed the race conditions in 3.)?
 
-Removing the lock from the sum method could lead to a race condition. Here a method, even when synchronized properly, could modify a value while the method `sum` is reading it, thereby leading it to reutnr a stale value.
+Removing the lock from the sum method could lead to a race condition. While `sum()` is in the process of reading the value of `sum` another call to either `addInstance()` or `addStatic()` could interleave in such a way that `sum()` returns a stale value

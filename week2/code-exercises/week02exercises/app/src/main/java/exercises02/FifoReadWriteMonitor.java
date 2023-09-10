@@ -51,7 +51,7 @@ public class FifoReadWriteMonitor {
             
             writer = true;
 
-            while (readersAcquireCount !=  readersReleaseCount) {
+            while (readersAcquireCount != readersReleaseCount) {
                 condition.await();
             }
         } catch (InterruptedException e) {
