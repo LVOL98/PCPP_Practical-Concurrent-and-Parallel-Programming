@@ -1,78 +1,72 @@
 package exercises02;
 
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 public class ReadWriteMonitor {
-  private final Lock lock = new ReentrantLock(true);
-  private final Condition condition = this.lock.newCondition();
   private boolean isWriting = false;
   private int readers = 0;
   private int writerQueue = 0;
 
   public void readLock() {
-    // Method copied from lecture example
-    this.lock.lock();
-    try {
-      while (this.isWriting || this.writerQueue > 0) {
-        if (this.writerQueue > 0) {
-          System.out.println(Thread.currentThread().getId() + " - waiting for writers queue: " + this.writerQueue);
+    synchronized (this) {
+      try {
+        while (this.isWriting || this.writerQueue > 0) {
+          if (this.writerQueue > 0) {
+            System.out.println(
+                " - Reader " + Thread.currentThread().getId() + " waiting for writers queue: " + this.writerQueue);
+          }
+          this.wait();
         }
-        this.condition.await();
+        this.readers++;
+      } catch (InterruptedException e) {
+      } finally {
       }
-      this.readers++;
-    } catch (InterruptedException e) {
-    } finally {
-      lock.unlock();
     }
   }
 
   public void readUnlock() {
-    // Method copied from lecture example
-    this.lock.lock();
-    try {
-      this.readers--;
-      if (this.readers == 0)
-        this.condition.signalAll();
-    } finally {
-      this.lock.unlock();
+    synchronized (this) {
+      try {
+        this.readers--;
+        if (this.readers == 0)
+          this.notifyAll();
+      } finally {
+      }
     }
   }
 
   public void writeLock() {
     // Method copied from lecture example
-    this.lock.lock();
-    try {
-      // Add writer to the queue
-      this.writerQueue++;
-      while (this.readers > 0 || this.isWriting) {
-        this.condition.await();
+    synchronized (this) {
+      try {
+        // Add writer to the queue
+        this.writerQueue++;
+        System.out.println(" - Writer " + Thread.currentThread().getId() + " queued as number " + this.writerQueue);
+        while (this.readers > 0 || this.isWriting) {
+          this.wait();
+        }
+        // As the writer successfully obtained lock the writer is removed from the queue
+        this.isWriting = true;
+        this.writerQueue--;
+      } catch (InterruptedException e) {
+      } finally {
       }
-      // As the writer successfully obtained lock the writer is removed from the queue
-      this.isWriting = true;
-      this.writerQueue--;
-    } catch (InterruptedException e) {
-    } finally {
-      this.lock.unlock();
     }
   }
 
   public void writeUnlock() {
     // Method copied from lecture example
-    this.lock.lock();
-    try {
-      this.isWriting = false;
-      this.condition.signalAll();
-    } finally {
-      this.lock.unlock();
+    synchronized (this) {
+      try {
+        this.isWriting = false;
+        this.notifyAll();
+      } finally {
+      }
     }
   }
 
   public static void main(String[] args) {
     // Method copied from lecture example
     ReadWriteMonitor m = new ReadWriteMonitor();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 100; i++) {
       // start a reader
       new Thread(() -> {
         m.readLock();
