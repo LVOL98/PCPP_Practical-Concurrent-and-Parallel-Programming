@@ -46,7 +46,7 @@ Further two Java `Semaphores` is used to control the access to the buffer, ensur
 #### 3
 *Is it possible to implement BoundedBuffer<T> using Barriers? Explain your answer.*
 
-yes I believe so
+No, due to barriers in Java doesn't ensure mutual exclusion, which is required in the BoundedBuffer. More specifically the critical section of the BounededBuffer is whenever an element is inserted to `push()` or removed from the queue `pop()`, we have to ensure mutual exclusion
 
 ## Exercise 3.2
 
