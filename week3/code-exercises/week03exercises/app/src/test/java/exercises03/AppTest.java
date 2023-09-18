@@ -7,7 +7,23 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AppTest {
-    @Test public void appHasAGreeting() {
-        assertNotNull("app should have a greeting", null);
+    @Test public void PersonId_TestValueConstructor() {      
+        var person1 = new Person(5);
+        var person2 = new Person();
+        var person3 = new Person();
+
+        assertEquals("", 5, person1.id());
+        assertEquals("", 6, person2.id());
+        assertEquals("", 7, person3.id());
+    }
+
+    @Test public void PersonId_NonValueConstructor() {
+        var person1 = new Person();
+        var person2 = new Person();
+        var person3 = new Person();
+
+        assertEquals("", 0, person1.id());
+        assertEquals("", 1, person2.id());
+        assertEquals("", 2, person3.id());
     }
 }
