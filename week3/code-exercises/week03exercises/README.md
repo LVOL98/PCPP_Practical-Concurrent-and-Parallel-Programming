@@ -29,12 +29,12 @@ interface BoundedBufferInteface<T> {
 
 ### Mandatory
 
-#### 1
+#### 3.1.1
 *Implement a class BoundedBuffer<T> as described above using only Java Semaphore for synchronization— i.e., Java Lock or intrinsic locks (synchronized) cannot be used.*
 
 See [./app/src/main/java/exercises03/BoundedBufferTest.java](./app/src/main/java/exercises03/BoundedBufferTest.java)
 
-#### 2
+#### 3.1.2
 *Explain why your implementation of BoundedBuffer<T> is thread-safe. Hint: Recall our definition of thread-safe class, and the elements to identify/consider in analyzing thread-safe classes (see slides).*
 
 In order to ensure that the class is thread safe we need a happens-before relationship. Specifically in this program we need to make sure that all modification to the buffer has a happens-before relationship, such that no race condition can occur.
@@ -43,7 +43,7 @@ Here the important part is the calls to `push()` and `pop()` because they modify
 
 Further two Java `Semaphores` is used to control the access to the buffer, ensuring that either a consumer (take) or producer (insert) only modifies a valid queue, e.g. `take()` is not called on an empty queue. While this doesn't necessarily ensuring thread safety, it is still necessary to ensure correct functionality of the program
 
-#### 3
+#### 3.1.3
 *Is it possible to implement BoundedBuffer<T> using Barriers? Explain your answer.*
 
 No, due to barriers in Java doesn't ensure mutual exclusion, which is required in the BoundedBuffer. More specifically the critical section of the BounededBuffer is whenever an element is inserted to `push()` or removed from the queue `pop()`, we have to ensure mutual exclusion
@@ -60,14 +60,35 @@ No, due to barriers in Java doesn't ensure mutual exclusion, which is required i
 - *There must be a constructor for Person that takes no parameters. When calling this constructor, each new instance of Person gets an id one higher than the previously created person. In case the constructor is used to create the first instance of Person, then the id for that object is set to 0.*
 - *There must be a constructor for Person that takes as parameter the initial id value from which future ids are generated. In case the constructor is used to create the first instance of Person, the initial parameter must be used. For subsequent instances, the parameter must be ignored and the value of the previously created person must be used (as stated in the previous requirement).*
 
-#### 1
+#### 3.2.1
 *Implement a thread-safe version of Person using Java intrinsic locks (synchronized). Hint: The Person class may include more attributes than those stated above; including static attributes.*
 
-#### 2
+See [./app/src/main/java/exercises03/PersonTest.java](./app/src/main/java/exercises03/PersonTest.java)
+
+#### 3.2.2
 *Explain why your implementation of the Person constructor is thread-safe, and why subsequent accesses to a created object will never refer to partially created objects.*
 
-#### 3
-*Implement a main thread that starting several threads the create and use instances of the Person class.*
+There's two reasons why the `Person` constructor is thread safe, 1. the use of static and 2. the use of the synchronized keyword
 
-#### 4
+1. In order to have the persons increment an id, we provide a static id in the person class. By using the static keyword we ensure that all instances of person have access to the variable and that it's initialized once the class is loaded by the JVM, thereby, eliminating the possbility of partially initialized clasess in regards to the `previousId` field
+2. Now class initialization is not thread safe, hence why we need to ensure that any modification or access to `previousId` ensures mutual exclusion. This is achieved by using static synchronus methods ensuring the same class lock is used for all class instances of `Person`
+
+#### 3.2.3
+*Implement a main thread that starting several threads that create and use instances of the Person class.*
+
+See [./app/src/main/java/exercises03/PersonTest.java](./app/src/main/java/exercises03/PersonTest.java)
+
+```
+Iteration: 0, expected: 4300 Thread 1, got zip: 2000, address: Thread 2
+Iteration: 512, expected: 4300 Thread 1, got zip: 2000, address: Thread 1
+Iteration: 8212, expected: 4300 Thread 1, got zip: 2000, address: Thread 2
+```
+
+#### 3.2.4
 *Assuming that you did not find any errors when running 3. Is your experiment in 3 sufficient to prove that your implementation is thread-safe?*
+
+Thread safety of the constructor was covered in [3.2.2](##3.2.2)
+
+First let's focus on methods that modifies values which besides the constructor the method `setzipAndAddress` modifies both `zip` and `address`. Here a read-modify-write race condition can occur, which our implementaion in the previous question tests, hence we can conclude that this part is thread-safe
+
+In regards to the rest of the class there's only getters left, and since no requirements to the getters was given, it's assumed that them returning stale values are accepted

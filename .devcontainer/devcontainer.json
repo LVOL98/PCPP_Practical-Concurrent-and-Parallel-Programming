@@ -18,7 +18,8 @@
 				"vscjava.vscode-gradle",
 				"GitHub.copilot",
 				"GitHub.copilot-labs",
-				"GitHub.copilot-chat"
+				"GitHub.copilot-chat",
+				"streetsidesoftware.code-spell-checker"
 			]
 		}
 	}
