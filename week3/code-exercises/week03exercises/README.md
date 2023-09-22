@@ -1,4 +1,4 @@
-# Solutions, Exercise 3
+# Solutions Exercise 3
 
 ## Exercise 3.1
 *A Bounded Buffer is a data structure that can only hold a fixed set of elements. In this exercise, you must implement such a data structure which allow elements to be inserted into the buffer by a number of producer threads, and taken by a number of consumer threads.*
