@@ -158,7 +158,24 @@ Though there exists some cases where all possible interleavings can be executed,
 
 *Hint II: The operations executed by the main test thread—i.e., the thread that starts the threads for testing are also part of interleavings. You may use the main thread to execute method calls in the tested semaphore before starting the threads that try to enter the critical section.*
 
-TODO
+Take the following pseudo code:
+
+```java
+public class SemaphoreImp {
+    ...
+
+	public void acquire() throws InterruptedException { ... }   // 1
+    public void release() { ... }                               // 2
+}
+```
+
+Let's now look at an instance of `SemaphoreImp` with a `capacity` of 2, and have the following execution of 3 threads (note, the value of state is also included):
+
+```
+t1(2), state = -1 --> t2(1), state = 0 --> t1(1), state = 1 --> t3(1), state = 2
+```
+
+Though the field `state` never exceeds the `capacity` of 2, three threads are in the critical section of 1, because the state was changed to a negative value
 
 ***
 
@@ -168,6 +185,6 @@ TODO
 
 *Note: The note and hints in 1 also apply to this exercise.*
 
-TODO
+See [./app/arm/main/test/java/exercises04/SemaphoreImpTest.java](./app/arm/main/test/java/exercises04/SemaphoreImpTest.java) test named `exercise_4_2_2`
 
 ***
