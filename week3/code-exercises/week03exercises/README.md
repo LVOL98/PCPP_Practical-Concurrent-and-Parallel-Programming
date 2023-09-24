@@ -1,3 +1,4 @@
+// TODO: Semaphores inside the lock, only one lock in boundedbuffer
 # Solutions Exercise 3
 
 ## Exercise 3.1
