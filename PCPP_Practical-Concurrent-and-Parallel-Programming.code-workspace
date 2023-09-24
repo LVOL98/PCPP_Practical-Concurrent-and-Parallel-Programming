@@ -16,7 +16,9 @@
 			"path": "week4/code-exercises/week04exercises"
 		}
 	],
-	"settings": {},
+	"settings": {
+		"java.debug.settings.onBuildFailureProceed": true
+	},
 	"extensions": {
 		"recommendations": [
 			"vscjava.vscode-java-pack",

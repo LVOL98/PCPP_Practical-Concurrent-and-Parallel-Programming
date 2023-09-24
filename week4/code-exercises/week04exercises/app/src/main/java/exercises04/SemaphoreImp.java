@@ -9,9 +9,13 @@ import java.util.concurrent.locks.Condition;
 
 public class SemaphoreImp {
 	private final int capacity;
-	private int state; // safely-published because it is initialized to zero (see constructor)
+	private int state;
 	private Lock lock;
 	private Condition condition;
+
+	public int getState() {
+		return state;
+	}
 
 	public SemaphoreImp(int c) {
 		capacity  = c;
