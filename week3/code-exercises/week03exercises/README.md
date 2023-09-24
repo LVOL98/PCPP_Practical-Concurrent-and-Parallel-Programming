@@ -1,4 +1,4 @@
-// TODO: Semaphores inside the lock, only one lock in boundedbuffer
+// TODO: Semaphores inside the lock, only one lock in boundedbuffer. 3.1.1 create a custom Semaphore lock
 # Solutions Exercise 3
 
 ## Exercise 3.1
