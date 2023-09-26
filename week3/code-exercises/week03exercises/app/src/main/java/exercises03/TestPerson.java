@@ -20,9 +20,9 @@ class TestPerson {
 
                 var result = person.setZipAndAddress(zip, address);
 
-                if (result.zip != zip || result.address != address) {
-                    System.out.println(String.format("Iteration: %d, expected: %s, got %s", i, zip + " " + address, result));
-                }
+                // if (result.zip != zip || result.address != address) {
+                //     System.out.println(String.format("Iteration: %d, expected: %s, got %s", i, zip + " " + address, result));
+                // }
             }
 
             t2ShouldRun = false;

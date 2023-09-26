@@ -1,0 +1,37 @@
+# OS:   Linux; 5.15.90.1-microsoft-standard-WSL2; amd64
+# JVM:  Eclipse Adoptium; 17.0.8.1
+# CPU:  null; 16 "cores"
+# Date: 2023-09-25T14:51:13+0000
+countSequential                 9901191,9 ns  471885,74         32
+countParallelN       1         10342673,8 ns  418395,86         32
+countParallelN       2          7414577,8 ns  387478,11         64
+countParallelN       3          5835413,4 ns  400720,86         64
+countParallelN       4          5206997,2 ns  209247,17         64
+countParallelN       5          4501809,5 ns  270224,39         64
+countParallelN       6          3981303,8 ns   96965,14         64
+countParallelN       7          3813011,6 ns   49811,58        128
+countParallelN       8          3754979,2 ns  155293,64        128
+countParallelN       9          3729585,8 ns   57216,83        128
+countParallelN      10          3723846,8 ns  104355,06        128
+countParallelN      11          3706627,1 ns   54679,18        128
+countParallelN      12          3727183,2 ns   59385,63        128
+countParallelN      13          3754326,3 ns   49956,04        128
+countParallelN      14          3682043,7 ns   45795,18        128
+countParallelN      15          3719533,8 ns   37134,14        128
+countParallelN      16          3758541,5 ns   17639,46        128
+countParallelN      17          3752656,6 ns   51902,84        128
+countParallelN      18          3730390,6 ns   28527,33        128
+countParallelN      19          3757758,0 ns   37756,85        128
+countParallelN      20          3695495,7 ns   63317,57        128
+countParallelN      21          3795647,0 ns   46816,73        128
+countParallelN      22          3763716,3 ns   37048,05        128
+countParallelN      23          3767617,4 ns   43485,54        128
+countParallelN      24          3781845,9 ns  134246,89        128
+countParallelN      25          3838061,3 ns   78877,98        128
+countParallelN      26          3892537,3 ns  133124,33        128
+countParallelN      27          3863154,8 ns   64909,23        128
+countParallelN      28          3887980,9 ns   67168,21        128
+countParallelN      29          3959189,8 ns  107080,58         64
+countParallelN      30          4087476,7 ns  126331,60         64
+countParallelN      31          4204668,1 ns  196361,27         64
+countParallelN      32          4332637,2 ns  130327,43         64
