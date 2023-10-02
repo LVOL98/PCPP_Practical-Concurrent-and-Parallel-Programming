@@ -1,17 +1,17 @@
 package exercises05;
 
 class LongCounter {
-  private volatile int count = 0;
+  private volatile long count = 0;
 
   public synchronized void increment() {
-    count = count + 1;
+    count++;
   }
 
-  public synchronized int get() {
+  public synchronized long get() {
     return count;
   }
 
-  public synchronized void add(int c) {
+  public synchronized void add(long c) {
     count += c;
   }
 

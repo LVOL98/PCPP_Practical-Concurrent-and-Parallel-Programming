@@ -40,7 +40,7 @@ ai value = 1392580000
 Uncontended lock                     11.7 ns       0.46   33554432
 ```
 
-Looking at the above result, we cannot say anything about Thread create start join as it was not mentioned in the slides. Otherwise every performance measure seems to take a but longer than what was in the slides, which in most cases is a rather small deviation from the slides. Only Thread create start deviates by quite a lot from the slides (by a factor of 10). This is probably due to either different operating systems, different version of JVM and so on.
+Looking at the above result, we cannot say anything about Thread create start join as it was not mentioned in the slides. Otherwise every performance measure seems to take a but longer than what was in the slides, which in most cases is a rather small deviation from the slides. Only Thread create start deviates by quite a lot from the slides (by a factor of 10). All these deviations could be due to the use of different operating systems, different version of JVM and so on.
 
 ***
 
@@ -66,8 +66,8 @@ TODO: why do our performance increase stop before our core count?
 
 Two things was observed in the test run
 
-1. With a too great amount of threads we see a performance cost. This is as expected that the overhead (coordination and so on) of threads starts to become greater than the performance benefits
-2. The performance gain mellowed out before the amount of threads equalled the amount of cores (around 6 threads). This could indicate that this specific scenario
+1. As expected with too many threads we see a performance cost. This is as expected that the overhead (coordination and so on) of threads starts to become greater than the performance benefits
+2. Surprisingly the performance gain mellowed out before the amount of threads equalled the amount of cores (around 6 threads). This could indicate that the optimum concurrency for this specific program lies around the 6 thread count
 
 ***
 
@@ -96,6 +96,8 @@ public class TestVolatile {
 ***
 *Use Mark7 (from Bendchmark.java) to compare the performance of incrementing a volatile int and a normal int. Include the results in your hand-in and comment on them: Are they plausible? Any surprises?*
 
+Due to the lack of synchronization we run the tests with sequential execution
+
 ```text
 Test of non-volatile int              2.9 ns       0.03  134217728
 Test of non-volatile int              3.0 ns       0.16  134217728
@@ -109,7 +111,7 @@ Test of volatile int                  3.0 ns       0.09  134217728
 Test of volatile int                  3.1 ns       0.12  134217728
 ```
 
-TODO: As expected using the keyword `volatile` in a sequential context should have a negleliable effect.
+Suprisingly we see little to no performance loss when using the `volatile` keyword in this sequential context. We've thuoght that reading the `vCtr`from main memory instead of the CPU cache would incurre a greater performance cost 
 
 ***
 
@@ -176,6 +178,115 @@ public class TestTimeSearch {
 
 *Extend LongCounter with these two methods in such a way that the counter can still be shared safely by several threads.*
 
+// TODO insert LongCounter
 
+***
+
+#### 5.4.2
+***
+*How many occurencies of "ipsum" is there in long-text-file.txt. Record the number in your solution.*
+
+```
+Array Size: 5697
+# Occurences of ipsum :1430
+```
+
+***
+
+#### 5.4.3
+***
+*Use Mark7 to benchmark the search function. Record the result in your solution.*
+
+```
+# OS:   Linux; 5.10.102.1-microsoft-standard-WSL2; amd64
+# JVM:  Eclipse Adoptium; 17.0.8.1
+# CPU:  null; 12 "cores"
+# Date: 2023-09-27T06:35:25+0000
+TestTimeSearch performance, Mark7      33507231.3 ns 1290057.00          8
+```
+
+***
+
+#### 5.4.4
+***
+*Extend the code in TestTimeSearch with a new method*
+
+```java
+private static long countParallelN(String target, String[] lineArray, int N, LongCounter lc) {
+    // uses N threads to search lineArray
+    ...
+}
+```
+
+*Fill in the body of countParallelN in such a way that the method uses N threads to search the lineArray. Provide a few test results that make i plausible that your code works correctly.*
+
+The implemented countParallelN
+
+```java
+private static long countParallelN(String target, String[] lineArray, int N, LongCounter lc) {
+    barrier = new CyclicBarrier(N + 1, null);
+
+    final var splits = evenlysplitInt(lineArray.length, N);
+
+    for (int i = 0; i < N; i++) {
+        var fromAndTo = splits.get(i);
+
+        new Thread(() -> {
+        try {
+            barrier.await();
+            search(target, lineArray, fromAndTo.get(0), fromAndTo.get(1), lc);
+            barrier.await();
+        } catch (InterruptedException | BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+        }).start();
+    }
+
+    try {
+        barrier.await();
+        barrier.await();
+    } catch (InterruptedException | BrokenBarrierException e) {
+        e.printStackTrace();
+    }
+
+    return lc.get();
+}
+```
+
+Following is test results for runinng the code with 1 to 10 threads
+
+```
+Thread count: 1 target: ipsum count: 1430
+Thread count: 2 target: ipsum count: 1430
+Thread count: 3 target: ipsum count: 1430
+Thread count: 4 target: ipsum count: 1430
+Thread count: 5 target: ipsum count: 1430
+Thread count: 6 target: ipsum count: 1430
+Thread count: 7 target: ipsum count: 1430
+Thread count: 8 target: ipsum count: 1430
+Thread count: 9 target: ipsum count: 1430
+Thread count: 10 target: ipsum count: 1430
+```
+
+***
+
+#### 5.4.5
+***
+*Use Mark7 to benchmark countParallelN. Record the result in your solution and provide a small discussion of the timing results.*
+
+TODO: run in proper conditions
+```
+Sequential                    201424425.0 ns 53852606.61          2
+1 threads                     141171210.0 ns 65195318.59          2
+2 threads                     143875872.5 ns 32500622.46          8
+3 threads                     160690610.0 ns 65559196.65          4
+4 threads                     119937662.5 ns 47122108.35          4
+5 threads                     177228155.0 ns 43473493.41          2
+6 threads                     167977765.0 ns 39430907.64          2
+7 threads                     148899340.0 ns 58942534.71          2
+8 threads                      95162160.0 ns 57312886.59          2
+9 threads                     125850602.5 ns 46979409.58          4
+10 threads                    152335115.0 ns 53027606.45          2
+```
 
 ***
