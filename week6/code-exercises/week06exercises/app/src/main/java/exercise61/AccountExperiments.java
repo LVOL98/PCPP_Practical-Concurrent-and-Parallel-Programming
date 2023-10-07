@@ -5,19 +5,28 @@ import benchmarking.Benchmark;
 
 public class AccountExperiments {
   static final int N = 10; // Number of accounts
-  static final int NO_TRANSACTION=5;
+  static final int NO_TRANSACTION = 5;
   
   static final Account[] accounts = new Account[N];
   static final Random rnd = new Random();
 
-  public static void main(String[] args){ new AccountExperiments(); }
+  public static void main(String[] args) { 
+    new AccountExperiments();
+  }
    
   public AccountExperiments() { 
-  // Create empty accounts
     for( int i = 0; i < N; i++){
       accounts[i] = new Account(i);
     }
-    //insert code using Mark7 to measure execution time
+
+  
+    for (int k = 1; k < 17; k += k) {
+      var noTransactions = k;
+      Benchmark.Mark7(String.format("Mark7 AccountExperiments with %d transactions and %d accounts", noTransactions, N), i -> {
+        doNTransactions(noTransactions);
+        return 0.0;
+      });
+    }
   }
 
   private static double doNTransactions(int noTransactions){
