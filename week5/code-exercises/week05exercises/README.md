@@ -11,7 +11,7 @@ Read the start of [./week5/exercises05.pdf](./week5/exercises05.pdf)
 ***
 *First compile and run the thread timing code as is, using Mark6, to get a feeling for the variation and robustness of the results. Do not hand in the results but discuss any strangenesses, such as large variation in the time measurements for each case.*
 
-First let's discuss the factors that could cause any deviations in program execution times. 
+We do see some large variation. First let's discuss the factors that could cause any deviations in program execution times. 
 
 1. Garbage collection: the JVM garbage collector might kick in during the execution slowing down the measurement being performed
 2. Interleaving of other programs: though we disabled most other programs, there's still some essential software from the OS running, that might put a thread on pause, that is currently being measured
@@ -40,7 +40,7 @@ ai value = 1392580000
 Uncontended lock                     11.7 ns       0.46   33554432
 ```
 
-Looking at the above result, we cannot say anything about Thread create start join as it was not mentioned in the slides. Otherwise every performance measure seems to take a but longer than what was in the slides, which in most cases is a rather small deviation from the slides. Only Thread create start deviates by quite a lot from the slides (by a factor of 10). All these deviations could be due to the use of different operating systems, different version of JVM and so on.
+Looking at the above result, we cannot say anything about Thread create start join as it was not mentioned in the slides. Otherwise every performance measure seems to take a bit longer than what was in the slides, which in most cases is a rather small deviation from the slides. Only Thread create start deviates by quite a lot from the slides (by a factor of 10). All these deviations could be due to the use of different operating systems, different version of JVM and so on.
 
 ***
 
@@ -53,7 +53,47 @@ Looking at the above result, we cannot say anything about Thread create start jo
 ***
 *Measure the performance of the prime counting example on your own hardware, as a function of the number of threads used to determine whether a given number is a prime. Record system information as well as the measurement results for 1. . . 32 threads in a text file. If the measurements take excessively long time on your computer, you may measure just for 1. . . 16 threads instead.*
 
-See [./5.2.1.txt](./5.2.1.txt)
+See [./5.2.1.txt](./5.2.1.txt) or below
+
+```
+# OS:   Linux; 5.15.90.1-microsoft-standard-WSL2; amd64
+# JVM:  Eclipse Adoptium; 17.0.8.1
+# CPU:  null; 16 "cores"
+# Date: 2023-09-25T14:51:13+0000
+countSequential                 9901191,9 ns  471885,74         32
+countParallelN       1         10342673,8 ns  418395,86         32
+countParallelN       2          7414577,8 ns  387478,11         64
+countParallelN       3          5835413,4 ns  400720,86         64
+countParallelN       4          5206997,2 ns  209247,17         64
+countParallelN       5          4501809,5 ns  270224,39         64
+countParallelN       6          3981303,8 ns   96965,14         64
+countParallelN       7          3813011,6 ns   49811,58        128
+countParallelN       8          3754979,2 ns  155293,64        128
+countParallelN       9          3729585,8 ns   57216,83        128
+countParallelN      10          3723846,8 ns  104355,06        128
+countParallelN      11          3706627,1 ns   54679,18        128
+countParallelN      12          3727183,2 ns   59385,63        128
+countParallelN      13          3754326,3 ns   49956,04        128
+countParallelN      14          3682043,7 ns   45795,18        128
+countParallelN      15          3719533,8 ns   37134,14        128
+countParallelN      16          3758541,5 ns   17639,46        128
+countParallelN      17          3752656,6 ns   51902,84        128
+countParallelN      18          3730390,6 ns   28527,33        128
+countParallelN      19          3757758,0 ns   37756,85        128
+countParallelN      20          3695495,7 ns   63317,57        128
+countParallelN      21          3795647,0 ns   46816,73        128
+countParallelN      22          3763716,3 ns   37048,05        128
+countParallelN      23          3767617,4 ns   43485,54        128
+countParallelN      24          3781845,9 ns  134246,89        128
+countParallelN      25          3838061,3 ns   78877,98        128
+countParallelN      26          3892537,3 ns  133124,33        128
+countParallelN      27          3863154,8 ns   64909,23        128
+countParallelN      28          3887980,9 ns   67168,21        128
+countParallelN      29          3959189,8 ns  107080,58         64
+countParallelN      30          4087476,7 ns  126331,60         64
+countParallelN      31          4204668,1 ns  196361,27         64
+countParallelN      32          4332637,2 ns  130327,43         64
+```
 
 ***
 
@@ -61,13 +101,12 @@ See [./5.2.1.txt](./5.2.1.txt)
 ***
 *Reflect and comment on the results; are they plausible? Is there any reasonable relation between the number of threads that gave best performance, and the number of cores in the computer you ran the benchmarks on? Any surprises?*
 
-TODO: run it not in a docker container
-TODO: why do our performance increase stop before our core count?
+The results seems plausible with a few surprises
 
 Two things was observed in the test run
 
 1. As expected with too many threads we see a performance cost. This is as expected that the overhead (coordination and so on) of threads starts to become greater than the performance benefits
-2. Surprisingly the performance gain mellowed out before the amount of threads equalled the amount of cores (around 6 threads). This could indicate that the optimum concurrency for this specific program lies around the 6 thread count
+2. Surprisingly the performance gain mellowed out before the amount of threads equalled the amount of cores (around 6 threads). This could indicate that the optimum concurrency for this specific program lies around the 6 thread count (more on parallel algorithms and Amdahl's law in exercise 6)
 
 ***
 
@@ -88,7 +127,6 @@ public class TestVolatile {
     }
 }
 ```
-
 
 ### Mandatory
 
@@ -178,7 +216,7 @@ public class TestTimeSearch {
 
 *Extend LongCounter with these two methods in such a way that the counter can still be shared safely by several threads.*
 
-// TODO insert LongCounter
+See [./weel05exercises/app/src/main/java/exercises05/LongCounter.java](./weel05exercises/app/src/main/java/exercises05/LongCounter.java)
 
 ***
 
@@ -274,19 +312,19 @@ Thread count: 10 target: ipsum count: 1430
 ***
 *Use Mark7 to benchmark countParallelN. Record the result in your solution and provide a small discussion of the timing results.*
 
-TODO: run in proper conditions
 ```
-Sequential                    201424425.0 ns 53852606.61          2
-1 threads                     141171210.0 ns 65195318.59          2
-2 threads                     143875872.5 ns 32500622.46          8
-3 threads                     160690610.0 ns 65559196.65          4
-4 threads                     119937662.5 ns 47122108.35          4
-5 threads                     177228155.0 ns 43473493.41          2
-6 threads                     167977765.0 ns 39430907.64          2
-7 threads                     148899340.0 ns 58942534.71          2
-8 threads                      95162160.0 ns 57312886.59          2
-9 threads                     125850602.5 ns 46979409.58          4
-10 threads                    152335115.0 ns 53027606.45          2
+Sequential                    134473903.4 ns 39395035.70          2
+1 threads                     154088612.8 ns 30855639.63          2
+2 threads                     143105149.4 ns 34967380.50          4
+3 threads                     131323066.0 ns 40559647.77          4
+4 threads                     136780399.8 ns 37841243.68          2
+5 threads                     142829034.3 ns 30374315.76          4
+6 threads                     151274401.8 ns 32921528.19          4
+7 threads                     134285726.5 ns 42397551.74          2
+8 threads                     127330035.9 ns 36941695.92          2
+9 threads                     144113498.3 ns 58459823.86          2
+10 threads                    158339028.1 ns 33150114.50          2
 ```
 
+It seems that the overhead of using threads does not improve the performance. Maybe this is caused by the long counter being the single bottleneck which needs to be handled synchronous anyway.
 ***

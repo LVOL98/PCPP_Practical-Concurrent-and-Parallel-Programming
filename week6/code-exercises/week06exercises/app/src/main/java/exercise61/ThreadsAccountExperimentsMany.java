@@ -26,7 +26,9 @@ public class ThreadsAccountExperimentsMany {
     }
 
     for (int i = 0; i < NO_THREADS; i++) {
+      var executorId = i;
       var t = threadPool.submit(() -> {
+        System.out.println("Executor id: " + executorId);
         try {
           doNTransactions(NO_TRANSACTION);
         } catch (Error ex) {

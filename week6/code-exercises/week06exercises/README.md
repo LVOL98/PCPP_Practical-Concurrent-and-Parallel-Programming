@@ -82,9 +82,7 @@ Now we have reached a deadlock as t1 has acquired the lock on 2 and t2 have acqu
 ***
 *Change the program in ThreadsAccountExperimentsMany.java to use a the executor framework instead of raw threads. Make it use a ForkJoin thread pool. For now do not worry about terminating the main thread, but insert a print statement in the doTransaction method, so you can see that all executors are active*
 
-TODO: Vertify that this is correct and remember that the next task is related to this task
-
-See See [./src/main/java/exercises61/ThreadsAccountExperimentsMany.java](./src/main/java/exercises61/ThreadsAccountExperimentsMany.java) which has the following implementation
+See [./src/main/java/exercises61/ThreadsAccountExperimentsMany.java](./src/main/java/exercises61/ThreadsAccountExperimentsMany.java) which has the following implementation
 
 ```java
   public ThreadsAccountExperimentsMany() {
@@ -111,6 +109,21 @@ See See [./src/main/java/exercises61/ThreadsAccountExperimentsMany.java](./src/m
       }
     }
   }
+```
+
+Below we see that each executor prints its own iteration id to the console (note: transaction prints was removed for clarity)
+
+```
+Executor id: 0
+Executor id: 1
+Executor id: 2
+Executor id: 3
+Executor id: 4
+Executor id: 5
+Executor id: 6
+Executor id: 7
+Executor id: 8
+Executor id: 9
 ```
 
 ***
@@ -178,9 +191,9 @@ countParallelN 16               3716660.4 ns   68489.22        128
 countParallelNLocal 16          3781135.4 ns  248233.54        128
 ```
 
-First let's just define what each of the calls does. sequential, countParallelN (**from now on called parallel**) and countParallelNLocal (**from now on called parallelLocal**) all count the amount of primes in a given range, but the parllel does it in parllel
+First let's just define what each of the calls does. sequential, countParallelN (**from now on called parallel**) and countParallelNLocal (**from now on called parallelLocal**) all count the amount of primes in a given range, but the two that has parallel in their name does it in parallel
 
-The difference between parallel and parllelLocal is that local uses a local counter per thread, which is summarized once each thread is finished, while the other parllel uses a shared `LongCounter`. What we see is that parllel runs ever so slightly faster than parallelLocal (in most cases), which demonstrates the overhead of synchronizing a shared memory structure
+The difference between parallel and parllelLocal is that local uses a local counter per thread, which is summed once each thread has finished while parllel uses a shared `LongCounter`. What we see is that parllelLocal runs ever so slightly faster than parallel (in most cases), which demonstrates the overhead of synchronizing a shared memory structure
 
 Further, we see that increasing the amount of threads above 4 doesn't yield any performance benefits. While the intervals given to each thread doesn't contain an equal amount of primes, the range of integers tested is rather short (1.000.000). Hence it's more probable that Amdahl's law is limiting the performance, where the overhead of creating threads for smaller and smaller intervals is greater than the performance benefits of paralizing the code that can be paralized
 
