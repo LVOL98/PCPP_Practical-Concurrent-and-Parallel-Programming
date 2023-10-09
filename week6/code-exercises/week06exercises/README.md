@@ -205,8 +205,6 @@ Further, we see that increasing the amount of threads above 4 doesn't yield any 
 
 See [./src/main/java/exercises62/TestCountPrimesThreadsFuture.java](./src/main/java/exercises62/TestCountPrimesThreadsFuture.java)
 
-TODO: Why don't we see any improvements?
-
 ```
 countSequential                 8037789.5 ns   99647.30         32
 countParallelN  1               8483520.3 ns   67305.75         32
@@ -242,6 +240,8 @@ countParallelNLocal 15          3971906.9 ns  191875.86         64
 countParallelN 16               4035461.3 ns  198823.02         64
 countParallelNLocal 16          4026936.0 ns   56653.03        128
 ```
+
+We don't see any performance gain by using a `ForkJoinPool` instead of `Threads` which could indicate that the current implementation of `TestCountPrimesThreads` can't utilize the benefits of `ForkJoinPool` such as, Work stealing, Thread reuse and more
 
 ***
 
