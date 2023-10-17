@@ -2,22 +2,34 @@
 // raup@itu.dk * 10/10/2021
 package exercises07;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntToDoubleFunction;
 
 class TestCASLockHistogram {
+	private static final int RANGE = 4999999;
 
     // Testing correctness and evaluating performance
     public static void main(String[] args) {
-
 		// Create an object `histogramCAS` with your Histogram CAS implementation
 		// Create an object `histogramLock` with your Histogram Lock from week 5
-
 
 		// Evaluate the performance of CAS vs Locks histograms
 		// Below you have the code for `countParallel`
 		// You also have the benchmarking code for Mark7
+		for (int i = 1; i < 17; i++) {
+			var threadCount = i;
+			var histogramLock = new HistogramLock(25, threadCount < 13 ? threadCount : 12);
+			var histogramCAS = new CasHistogram(25);
 
+			TestCASLockHistogram.Mark7(String.format("Mark7 HistogramLock with %d threads", threadCount), k -> {
+				countParallel(RANGE, threadCount, histogramLock);
+				return 0;
+			});
+			
+			TestCASLockHistogram.Mark7(String.format("Mark7 HistogramCAS with %d threads", threadCount), k -> {
+				countParallel(RANGE, threadCount, histogramCAS);
+				return 0;
+			});
+		}
     }
     
     // Function to count the prime factors of a number `p`
