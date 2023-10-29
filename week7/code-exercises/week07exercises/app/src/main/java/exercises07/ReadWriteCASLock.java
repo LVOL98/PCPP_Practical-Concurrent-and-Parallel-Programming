@@ -8,7 +8,6 @@ import java.util.concurrent.atomic.AtomicReference;
 // Very likely you will need some imports here
 
 class ReadWriteCASLock implements SimpleRWTryLockInterface {
-    // TODO: Add necessary field(s) for the class
     private final AtomicReference<Holders> holdersReference = new AtomicReference<Holders>();
 
     public boolean readerTryLock() {
@@ -22,7 +21,6 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
             }
 
             readers = (ReaderList) holders;
-
             readersNew = new ReaderList(Thread.currentThread(), readers);
         } while (!holdersReference.compareAndSet(holders, readersNew));
 
@@ -55,6 +53,7 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
         } while (!holdersReference.compareAndSet(holders, readersNew));
     }
 
+    // TODO: fairness? starvation?
     public boolean writerTryLock() {
         var holders = holdersReference.get();
 
@@ -62,12 +61,7 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
             return false;
         }
 
-        if (holders instanceof ReaderList) {
-            // TODO: fairness? starvation?
-            return false;
-        } else {
-            return holdersReference.compareAndSet(holders, new Writer(Thread.currentThread()));
-        }
+        return holdersReference.compareAndSet(holders, new Writer(Thread.currentThread()));
     }
 
     public void writerUnlock() {
@@ -75,12 +69,11 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
 
         if (holders == null) {
             throw new IllegalStateException("No one holds the lock");
+        } else if (((Writer)holders).thread != Thread.currentThread()) {
+            throw new IllegalStateException("Cannot unlock a different thread than itself");
         } else if (holders instanceof ReaderList) {
             throw new IllegalStateException("Cannot unlock a reader lock with write unlock");
         } 
-        else if (((Writer)holders).thread != Thread.currentThread()) {
-            throw new IllegalStateException("Cannot unlock a different thread than itself");
-        }
 
         // TODO: need a do while loop?
         holdersReference.compareAndSet(holders, null);
