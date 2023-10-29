@@ -11,11 +11,11 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
     private final AtomicReference<Holders> holdersReference = new AtomicReference<Holders>();
 
     public boolean readerTryLock() {
-        var holders = holdersReference.get();
-        ReaderList readers;
-        ReaderList readersNew;
-
         do {
+            var holders = holdersReference.get();
+            ReaderList readers;
+            ReaderList readersNew;
+            
             if (holders instanceof Writer) {
                 return false;
             }
