@@ -62,6 +62,7 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
         }
 
         return holdersReference.compareAndSet(holders, new Writer(Thread.currentThread()));
+        // return holdersReference.compareAndSet(null, new Writer(Thread.currentThread()));
     }
 
     public void writerUnlock() {

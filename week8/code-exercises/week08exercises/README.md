@@ -124,7 +124,7 @@ public void push(T value) {
 }	    
 ```
 
-In the case of `push` the linearization point is when the `compareAndSet` succeeds at `PO6`
+In the case of `push` the linearization point is when the `compareAndSet` succeeds at `PO6`, also `PO4` as the execution finishes
 
 ```java
 public T pop() {
