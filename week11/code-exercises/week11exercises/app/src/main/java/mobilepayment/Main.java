@@ -5,16 +5,12 @@ import akka.actor.typed.ActorSystem;
 import java.io.IOException;
 
 public class Main {
-
     public static void main(String[] args) {
-    
-		// start actor system
-		// To be implemented
+		final var system = ActorSystem.create(Guardian.create(), "mobile-payment");
 
-		// init message
-		// To be implemented
+		// system.tell(new Guardian.Exercise_11_1_5(100));
+		system.tell(new Guardian.Exercise_11_1_6());
 
-		// wait until user presses enter
 		try {
 			System.out.println(">>> Press ENTER to exit <<<");
 			System.in.read();
@@ -23,10 +19,7 @@ public class Main {
 			System.out.println("Error " + e.getMessage());
 			e.printStackTrace();
 		} finally {
-			// terminate actor system execution
-			// To be implemented
+			system.terminate();
 		}
-    
-    }
-    
+    }    
 }
