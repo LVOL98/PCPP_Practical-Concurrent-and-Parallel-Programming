@@ -224,7 +224,7 @@ source().filter(w -> w.length() > 5).sink()
 - *as a RxJava statement where the source could be an input field where a user types strings*
 
 **JavaStream**
-This statement will create a pipeline which filters any w (assumed to be work) whose length is less than 5. The pipeline will execute immediately performing the filter on the data input, this is due to the `sink()` call (pull)
+This statement will create a pipeline which filters any w (assumed to be word) whose length is less than 5. The pipeline will execute immediately performing the filter on the data input, this is due to the `sink()` call (pull)
 
 **RxJava**
 The same as above but, this adds an a filter to an observable (`source()`) that removed any inputs that have a length less than 5. The pipeline will be executed once some data has been added to the `source()` (push)
@@ -243,6 +243,10 @@ source().filter(w -> w.length() > 10).sink()
 - *as a JavaStream (e.g. the source is a file)*
 - *as a RxJava statement where the source could be an input field where a user types strings*
 
-Same as above but with the predicate have changed in one of the calls
+**JavaStream**
+This will throw an exception as the `source()` has already been consumed
+
+**RxJava**
+This is allowed as both lines can observe the same data source
 
 ***
