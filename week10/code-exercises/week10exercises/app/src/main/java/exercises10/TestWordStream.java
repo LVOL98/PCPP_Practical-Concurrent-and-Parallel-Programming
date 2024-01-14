@@ -52,18 +52,7 @@ public class TestWordStream {
   }
 
   public static boolean isPalindrome(String s) {
-    var end = s.length() - 1;
-    for (int start = 0; start < s.length(); start++) {
-      if (start > end) {
-        return true;
-      } else if (s.charAt(start) != s.charAt(end)) {
-        return false;
-      }
-
-      end--;
-    }
-
-    return false;
+    return s.equals(new StringBuilder(s).reverse().toString());
   }
 
   public static Map<Character,Integer> letters(String s) {
